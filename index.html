@@ -63,7 +63,7 @@ li button{min-height:36px;padding:2px 10px;font-size:15px}
 .row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
 .row button{flex:1}
 .empty{color:var(--mute);margin:4px 0}
-#msg{position:fixed;left:16px;right:16px;bottom:calc(var(--qb) + 70px);z-index:8;text-align:center;pointer-events:none;color:var(--blue);font-weight:700;text-shadow:0 0 8px var(--bg),0 0 8px var(--bg)}
+#msg{position:fixed;left:16px;right:16px;bottom:calc(var(--qb) + 70px);z-index:8;text-align:center;pointer-events:none;color:var(--blue);font-weight:700}#msg:not(:empty){background:var(--bg);border:1px solid var(--blue);border-radius:12px;padding:10px 14px;box-shadow:0 4px 18px rgba(0,0,0,.45)}
 .dial{position:relative;width:210px;max-width:70%;margin:8px auto}
 .dial svg{width:100%;display:block}
 .dial b{position:absolute;inset:0;display:grid;place-items:center;font-size:46px;color:var(--ink)}
@@ -290,11 +290,14 @@ function scanStop(){SC.on=false;clearTimeout(SC.raf);if(SC.stream){SC.stream.get
 function searchView(){var b=SR.busy==='s';
 return'<section class="win"><h2>'+T('Buscar alimento','Search food')+'</h2><label for="sq">'+T('Nombre del alimento','Food name')+'</label><div class="grid" style="grid-template-columns:1fr auto"><input id="sq" value="'+esc(SR.q)+'" oninput="SR.q=this.value" placeholder="'+T('arroz blanco','white rice')+'"><button onclick="foodSearch()">'+T('Buscar','Search')+'</button></div><label for="bc" style="margin-top:8px">'+T('Código de barras','Barcode')+'</label><div class="grid" style="grid-template-columns:1fr auto auto"><input id="bc" inputmode="numeric" value="'+esc(SR.bc)+'" oninput="SR.bc=this.value"><button onclick="lookupCode(SR.bc)">'+T('Buscar','Look up')+'</button><button onclick="scanStart()">'+T('Escanear','Scan')+'</button></div>'+(SC.on?'<video id="scv" playsinline muted style="width:100%;border-radius:12px;margin-top:8px"></video><div class="row"><button onclick="scanStop()">'+T('Cerrar cámara','Close camera')+'</button></div>':'')+'<label for="sg" style="margin-top:8px">'+T('Cantidad (g)','Amount (g)')+'</label><input id="sg" type="number" inputmode="decimal" value="'+SR.g+'" oninput="SR.g=this.value">'+(b?'<p class="empty">'+T('Buscando…','Searching…')+'</p>':'')+(SR.items.length?'<ul>'+SR.items.map(function(f,i){return'<li><span>'+esc(f.n)+'<small>'+T('por 100 g: ','per 100 g: ')+Math.round(f.k)+' kcal · P '+Math.round(f.p)+' · C '+Math.round(f.c)+' · G '+Math.round(f.g)+'</small></span><button class="chip" onclick="foodAdd('+i+')">'+T('Añadir','Add')+'</button></li>'}).join('')+'</ul>':'')+'<p class="empty">'+T('Datos de Open Food Facts. Pueden estar incompletos: revisa las cifras.','Data from Open Food Facts. It may be incomplete: check the numbers.')+'</p></section>'}
 async function gem(parts,json){var k=S.ai&&S.ai.key;if(!k)throw new Error('nokey');var body={contents:[{role:'user',parts:parts}]};if(json)body.generationConfig={responseMimeType:'application/json'};
-for(var t=0;t<5;t++){var m=S.ai.model||'gemini-flash-latest';
+var q=[S.ai.model||'gemini-flash-latest'].concat(S.ai.alt||[]);if(q.indexOf('gemini-flash-latest')<0)q.push('gemini-flash-latest');var last='',lastSt=0;
+for(var i=0;i<q.length&&i<6;i++){var m=q[i];
 var r=await fetchT('https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(m)+':generateContent',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':k},body:JSON.stringify(body)},40000,1);
-if(!r.ok){var e=await r.text();if((r.status===404||(r.status===400&&/model/i.test(e)&&!/API key/i.test(e)))&&S.ai.alt&&S.ai.alt.length){S.ai.model=S.ai.alt.shift();save();continue}throw new Error('Gemini '+r.status+': '+e.slice(0,140))}
+if(r.ok){if(i>0&&lastSt===404){S.ai.model=m;S.ai.alt=q.slice(i+1).filter(function(x){return x!==m});save()}
 var j=await r.json(),p=(((j.candidates||[])[0]||{}).content||{}).parts||[];return p.map(function(x){return x.text||''}).join('')}
-throw new Error('Gemini 404: modelo no disponible')}
+var e=await r.text();last='Gemini '+r.status+': '+e.slice(0,140);lastSt=r.status;
+if(r.status===429||r.status===404||(r.status===400&&/model/i.test(e)&&!/API key/i.test(e)))continue;throw new Error(last)}
+throw new Error(last||'Gemini 404: modelo no disponible')}
 function gemRank(n){var m=n.match(/gemini-(\d+(?:\.\d+)?)-flash/),v=m?parseFloat(m[1]):0,lite=/lite/.test(n),pre=/preview|exp/.test(n);return[lite?2:pre?1:0,-v,n]}
 function gemModels(list){var all=(list||[]).filter(function(m){return(m.supportedGenerationMethods||[]).indexOf('generateContent')>=0}).map(function(m){return m.name.replace('models/','')}).filter(function(n){return/flash/.test(n)&&!/image|tts|live|audio|thinking|robotics|computer|embedding|native|dialog|omni|vision/.test(n)});
 return all.sort(function(a,b){var x=gemRank(a),y=gemRank(b);return x[0]-y[0]||x[1]-y[1]||(x[2]<y[2]?-1:1)}).slice(0,8)}
@@ -419,8 +422,13 @@ async function qaAI(parts,clear){QA.busy=true;qdDraw();
 try{var t=await gem(parts,true),o=JSON.parse(String(t).replace(/^\s*```(?:json)?/i,'').replace(/```\s*$/,'').trim());QD=qaNorm(o);if(!QD.meals.length&&!QD.sets.length)say(T('No encontré comida ni ejercicio en eso.','I found no meal or exercise in that.'));else if(clear){var i=document.getElementById('qi');if(i)i.value=''}}
 catch(e){say(e.message==='nokey'?T('Primero pon tu clave de Gemini en Strategos.','First add your Gemini key in Strategos.'):netErr(e))}
 QA.busy=false;qdDraw()}
+function qaLocalFood(text){var parts=text.split(/[;\n,]+|\s+y\s+|\s+and\s+/i).map(function(x){return x.trim()}).filter(Boolean),o={meals:[],sets:[]};if(!parts.length)return null;
+for(var i=0;i<parts.length;i++){var pr=fbParse(parts[i].toLowerCase()),f=fbLocal(pr.name)||(S.fc&&S.fc[pr.name]);if(!f)return null;var q=pr.q?parseFloat(pr.q):1;if(!(q>0))q=1;
+var r=function(v){return Math.round((+v||0)*q*10)/10};o.meals.push({n:pr.q&&q!==1?pr.name+' ×'+q:pr.name,t:hourType(),k:Math.round((+f.k||0)*q),p:r(f.p),c:r(f.c),g:r(f.g),fi:r(f.fi),so:Math.round((+f.so||0)*q)})}
+return o}
 function qaSend(){var i=document.getElementById('qi');if(!i||QA.busy)return;var text=i.value.trim();if(!text){i.focus();return}i.blur();
 var r=qaRule(text);if(r){QD=r;i.value='';qdDraw();return}
+var lf=qaLocalFood(text);if(lf){QD=lf;i.value='';qdDraw();return}
 if(!(S.ai&&S.ai.key)){say(T('Sin IA entiendo frases como “sentadilla 3x10 130 lb” o “arroz 300 kcal”. Para texto libre pon tu clave de Gemini en Strategos.','Without AI I understand phrases like “squat 3x10 130 lb” or “rice 300 kcal”. For free text add your Gemini key in Strategos.'));return}
 qaAI([{text:QP+text}],true)}
 async function qaPhoto(inp){var f=inp.files&&inp.files[0];if(!f)return;try{var b=await shrink(f);inp.value='';await qaAI([{text:QP+'Mira la foto, identifica los alimentos y estima la porción de cada uno.'},{inline_data:{mime_type:'image/jpeg',data:b}}],false)}catch(e){say(T('No se pudo leer la foto.','Could not read the photo.'))}}
