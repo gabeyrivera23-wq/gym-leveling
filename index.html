@@ -151,7 +151,7 @@ svg [role=button]{cursor:pointer}svg [role=button]:focus-visible{outline:2px sol
 </main>
 <script>
 var LV={w:null,l:0,tm:0};
-var VPAUSE=650;
+var VPAUSE=325;
 var VAI=[['Algenib',{es:'Grave y rasposa',en:'Deep and gravelly'}],['Charon',{es:'Seria e informativa',en:'Serious, informative'}],['Orus',{es:'Firme',en:'Firm'}],['Alnilam',{es:'Firme y clara',en:'Firm and clear'}],['Gacrux',{es:'Madura',en:'Mature'}],['Fenrir',{es:'Intensa',en:'Intense'}],['Kore',{es:'Firme (suave)',en:'Firm (soft)'}],['Puck',{es:'Alegre',en:'Upbeat'}]];
 var S={xp:0,meals:{},sets:{},theme:'',goals:{k:2200,p:150,c:220,g:70,f:28,s:2300,w:64},lang:'es',water:{},weights:{},fav:[],routines:[],plan:[],done:{},body:{},photos:[],sx:'',wu:'',fc:{},me:{n:'',l:'',f:'',i:'',a:'',x:'',o:'m'}},tab='comidas';
 function toLb(o){var c=function(w){return Math.round((+w||0)*2.20462*2)/2};if(o.sets&&typeof o.sets==='object')Object.keys(o.sets).forEach(function(d){if(Array.isArray(o.sets[d]))o.sets[d].forEach(function(x){x.w=c(x.w)})});if(Array.isArray(o.plan))o.plan.forEach(function(x){x.w=c(x.w)});if(Array.isArray(o.routines))o.routines.forEach(function(r){if(r&&Array.isArray(r.ex))r.ex.forEach(function(x){x.w=c(x.w)})})}
@@ -730,7 +730,7 @@ if(!t)return;if(k==='rest'&&VZ.pre&&VZ.pre.g===g&&VZ.pre.t){t=VZ.pre.t}VZ.pre=nu
 function vzBrowser(t,g){try{var es=S.lang!=='en',u=new SpeechSynthesisUtterance(t),v=vzVoice();u.lang=es?'es-ES':'en-US';if(v){u.voice=v;u.lang=v.lang||u.lang}u.pitch=g?.75:1;u.rate=g?.88:1;u.volume=1;speechSynthesis.cancel();setTimeout(function(){try{speechSynthesis.speak(u)}catch(e){}},VPAUSE)}catch(e){}}
 function vzSet(v){S.vz=v;save();vzSay('test');render()}
 function vzTest(){if(S.vz==='o'){say(T('La voz está en silencio.','Voice is muted.'));return}vzSay('test')}
-var APPV='23 nov 2026 · v10 · voz sin descripción y con pausa';
+var APPV='23 nov 2026 · v11 · pausa de voz más corta';
 function vzPref(){var vs=vzVoices(),cur=vzVoice(),o=function(v,l){return'<option value="'+v+'"'+((S.vz||'n')===v?' selected':'')+'>'+l+'</option>'};
 return'<label for="vzm" style="margin-top:8px">'+T('Voz de la app','App voice')+'</label><select id="vzm" onchange="vzSet(this.value)">'+o('n',T('Normal','Normal'))+o('g',T('Dios griego (grave y épica)','Greek god (deep and epic)'))+o('o',T('Silencio','Muted'))+'</select>'+
 (vs.length?'<label for="vzv">'+T('Voz del teléfono','Phone voice')+'</label><select id="vzv" onchange="S.vzv=this.value;save();vzSay(\'test\')"><option value="">'+T('Automática','Automatic')+'</option>'+vs.map(function(v){return'<option value="'+esc(v.voiceURI||v.name)+'"'+(S.vzv&&cur&&(cur.voiceURI===v.voiceURI||cur.name===v.name)&&(S.vzv===v.voiceURI||S.vzv===v.name)?' selected':'')+'>'+esc(v.name)+'</option>'}).join('')+'</select>':'')+
