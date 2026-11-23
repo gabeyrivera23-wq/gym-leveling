@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="es"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <title>GYM Leveling</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="icon-192.png">
@@ -15,7 +15,7 @@
 *,*::before,*::after{box-sizing:inherit}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:'Rajdhani',system-ui,sans-serif;font-weight:500;font-size:18px;line-height:1.35}
-main{max-width:520px;margin:0 auto;padding:14px 14px 140px}
+main{max-width:520px;margin:0 auto;padding:14px 14px 210px}
 header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
 .ttl{flex:1;min-width:0}header h1{font-size:26px;font-weight:700;margin:0;letter-spacing:.5px;line-height:1.1}#un{display:block;font-size:15px;color:var(--mute)}
 .logo{width:72px;height:72px;color:var(--blue);filter:drop-shadow(0 0 6px var(--glow))}
@@ -63,7 +63,7 @@ li button{min-height:36px;padding:2px 10px;font-size:15px}
 .row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
 .row button{flex:1}
 .empty{color:var(--mute);margin:4px 0}
-#msg{position:fixed;left:16px;right:16px;bottom:calc(140px + env(safe-area-inset-bottom,0px));z-index:6;text-align:center;pointer-events:none;color:var(--blue);font-weight:700;text-shadow:0 0 8px var(--bg),0 0 8px var(--bg)}
+#msg{position:fixed;left:16px;right:16px;bottom:calc(var(--qb) + 70px);z-index:8;text-align:center;pointer-events:none;color:var(--blue);font-weight:700;text-shadow:0 0 8px var(--bg),0 0 8px var(--bg)}
 .dial{position:relative;width:210px;max-width:70%;margin:8px auto}
 .dial svg{width:100%;display:block}
 .dial b{position:absolute;inset:0;display:grid;place-items:center;font-size:46px;color:var(--ink)}
@@ -80,6 +80,19 @@ li button{min-height:36px;padding:2px 10px;font-size:15px}
 textarea{font:inherit;font-size:14px;width:100%;padding:8px 10px;border-radius:10px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink)}
 textarea:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
 .ans{white-space:pre-wrap;margin:8px 0}
+
+:root{--qb:calc(76px + env(safe-area-inset-bottom,0px))}
+body.typing{--qb:8px}body.typing nav{display:none}
+#qa{position:fixed;left:12px;right:12px;bottom:var(--qb);max-width:496px;margin:0 auto;z-index:5;display:flex;align-items:center;gap:6px;padding:5px 6px;background:var(--panel);border:1.5px solid var(--line);border-radius:999px;box-shadow:0 4px 18px var(--glow)}
+#qa[hidden],#qd[hidden],#qm[hidden]{display:none}
+#qa input#qi{flex:1;min-width:0;border:0;background:transparent;font-size:17px;padding:0 6px;min-height:44px;border-radius:0}
+#qa input#qi:focus-visible{outline:0}#qa:focus-within{border-color:var(--blue)}
+.qb{flex:none;width:44px;height:44px;min-height:44px;padding:0;border-radius:50%;display:grid;place-items:center;background:var(--bg);border:1.5px solid var(--line);color:var(--blue)}
+.qb.go{background:var(--blue);color:var(--onblue);border-color:var(--blue)}.qb.on{background:#ff2d6f;border-color:#ff2d6f;color:#fff}
+#qm{position:fixed;left:12px;bottom:calc(var(--qb) + 62px);z-index:7;min-width:240px;padding:6px;background:var(--panel);border:1.5px solid var(--line);border-radius:16px;box-shadow:0 6px 24px rgba(0,0,0,.35);display:flex;flex-direction:column;gap:2px}
+#qm button{text-align:left;border:0;border-radius:10px;padding:10px 12px;min-height:44px;background:transparent;color:var(--ink);font-weight:600}
+#qd{position:fixed;left:12px;right:12px;bottom:calc(var(--qb) + 62px);max-width:496px;margin:0 auto;z-index:6;max-height:50vh;overflow:auto;padding:12px 14px;background:var(--panel);border:1.5px solid var(--blue);border-radius:16px;box-shadow:0 6px 24px rgba(0,0,0,.35)}
+.tg{display:inline-block;font-size:13px;color:var(--blue);margin-right:6px}
 </style></head>
 <body><main>
 <header>
@@ -89,6 +102,7 @@ textarea:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
 </header>
 <div id="app"></div>
 <p id="msg" role="status"></p>
+<div id="qd" hidden></div><div id="qm" hidden></div><div id="qa" hidden></div>
 <div class="foot"><button id="lg" onclick="toggleLang()">English</button><p class="note">No se acepta estar Fanton en las comidas ni en los dias de piernas</p></div>
 </main>
 <script>
@@ -125,7 +139,7 @@ function speak(){var t=totals();if(!window.speechSynthesis){say('Tu navegador no
 var en=S.lang==='en',u=new SpeechSynthesisUtterance(en?'Today you have '+t.k+' calories, '+t.p+' grams of protein, '+t.c+' of carbs and '+t.g+' of fat.':'Hoy llevas '+t.k+' calorías, '+t.p+' gramos de proteína, '+t.c+' de carbohidratos y '+t.g+' de grasa.');u.lang=en?'en-US':'es-ES';speechSynthesis.cancel();speechSynthesis.speak(u)}
 function ring(l,v,g,c){v=Math.round(v);g=g||1;var C=263.9,p=Math.min(v/g,1)*C;return'<div class="ring"><div>'+l+'</div><svg viewBox="0 0 100 100" role="img" aria-label="'+l+': '+v+' de '+g+'"><circle cx="50" cy="50" r="42" fill="none" stroke="var(--line)" stroke-width="6"/><circle cx="50" cy="50" r="42" fill="none" stroke="'+c+'" stroke-width="7" stroke-linecap="round" stroke-dasharray="'+p+' '+C+'" transform="rotate(-90 50 50)"/><text x="50" y="55" font-size="26" font-weight="700">'+v+'</text><text x="50" y="72" font-size="13" style="fill:var(--mute)">de '+g+'</text></svg></div>'}
 function setGoal(k,v){var n=parseFloat(v);if(n>0){S.goals[k]=n;save();render()}}
-var D=[['Progreso','Progress'],['Descanso entre series. Elige el tiempo y toca Iniciar.','Rest between sets. Pick a time and tap Start.'],['Escribe entre 5 y 3600 segundos.','Enter between 5 and 3600 seconds.'],['¡Descanso terminado!','Rest is over!'],['Tiempo de descanso','Rest time'],['Otro tiempo (segundos)','Other time (seconds)'],['Reiniciar','Reset'],['Iniciar','Start'],['Pausa','Pause'],['Seguir','Resume'],['Fijar','Set'],['Toca el botón azul para registrar la primera serie.','Tap the blue button to log your first set.'],['Datos guardados. Metas del día calculadas.','Data saved. Daily goals calculated.'],['Datos guardados. Completa peso, estatura, edad y sexo para calcular tus metas.','Data saved. Fill in weight, height, age and sex to calculate your goals.'],['Las metas se calculan al guardar, con la fórmula Mifflin-St Jeor y actividad moderada. Son estimaciones, no un plan médico.','Goals are calculated when you save, using the Mifflin-St Jeor formula and moderate activity. They are estimates, not medical advice.'],['Edad','Age'],['Sexo','Sex'],['Hombre','Male'],['Mujer','Female'],['Elige','Select'],['Objetivo','Goal'],['Bajar peso','Lose weight'],['Mantener','Maintain'],['Subir masa','Build muscle'],['Datos del usuario','User data'],['Datos guardados.','Data saved.'],['Guardar datos','Save data'],['Peso corporal (lb)','Body weight (lb)'],['Estatura (pies)','Height (feet)'],['Pulgadas','Inches'],['IMC','BMI'],['Nombre','Name'],['Aún no registras comidas hoy. Añade la primera arriba.','No meals logged today. Add the first one above.'],['Aún no registras series hoy. Añade la primera arriba.','No sets logged today. Add the first one above.'],['Primera vez que lo registras','First time logging this'],['Cambiar entre modo claro y oscuro','Switch between light and dark mode'],['Escribe el nombre de la comida.','Enter the food name.'],['Escribe el nombre del ejercicio.','Enter the exercise name.'],['Tu navegador no permite copiar.','Your browser cannot copy.'],['Tu navegador no tiene voz.','Your browser has no voice.'],['Logo: perfil de un dios con piel de león','Logo: profile of a god wearing a lion pelt'],['¡Subiste al nivel ','You reached level '],['Comidas registradas','Logged meals'],['Series de hoy','Today’s sets'],['Macros de hoy','Today’s macros'],['Metas del día','Daily goals'],['Añadir comida','Add food'],['Guardar comida','Save food'],['Añadir serie','Add set'],['Guardar serie','Save set'],['Compartir día','Share day'],['Leer macros','Read macros'],['Resumen copiado.','Summary copied.'],['No se pudo copiar.','Could not copy.'],['Arroz con pollo','Chicken and rice'],['Carbohidratos','Carbs'],['Repeticiones','Reps'],['Entrenamiento','Training'],['Última vez: ','Last time: '],['Calorías','Calories'],['Ejercicio','Exercise'],['Peso (lb)','Weight (lb)'],['Sentadilla','Squat'],['Proteína','Protein'],['Comidas','Meals'],['Comida','Food'],['Sistema','System'],['Rutina','Routine'],['Borrar','Delete'],['Grasa','Fat'],['Nivel','Level'],['>de ','>of '],[' de ',' of ']];
+var D=[['Progreso','Progress'],['Descanso entre series. Elige el tiempo y toca Iniciar.','Rest between sets. Pick a time and tap Start.'],['Escribe entre 5 y 3600 segundos.','Enter between 5 and 3600 seconds.'],['¡Descanso terminado!','Rest is over!'],['Tiempo de descanso','Rest time'],['Otro tiempo (segundos)','Other time (seconds)'],['Reiniciar','Reset'],['Iniciar','Start'],['Pausa','Pause'],['Seguir','Resume'],['Fijar','Set'],['Escribe tu primera serie en la barra de abajo, por ejemplo “sentadilla 3x10 130 lb”.','Type your first set in the bar below, for example “squat 3x10 130 lb”.'],['Datos guardados. Metas del día calculadas.','Data saved. Daily goals calculated.'],['Datos guardados. Completa peso, estatura, edad y sexo para calcular tus metas.','Data saved. Fill in weight, height, age and sex to calculate your goals.'],['Las metas se calculan al guardar, con la fórmula Mifflin-St Jeor y actividad moderada. Son estimaciones, no un plan médico.','Goals are calculated when you save, using the Mifflin-St Jeor formula and moderate activity. They are estimates, not medical advice.'],['Edad','Age'],['Sexo','Sex'],['Hombre','Male'],['Mujer','Female'],['Elige','Select'],['Objetivo','Goal'],['Bajar peso','Lose weight'],['Mantener','Maintain'],['Subir masa','Build muscle'],['Datos del usuario','User data'],['Datos guardados.','Data saved.'],['Guardar datos','Save data'],['Peso corporal (lb)','Body weight (lb)'],['Estatura (pies)','Height (feet)'],['Pulgadas','Inches'],['IMC','BMI'],['Nombre','Name'],['Aún no registras comidas hoy. Añade la primera arriba.','No meals logged today. Add the first one above.'],['Aún no registras series hoy. Añade la primera arriba.','No sets logged today. Add the first one above.'],['Primera vez que lo registras','First time logging this'],['Cambiar entre modo claro y oscuro','Switch between light and dark mode'],['Escribe el nombre de la comida.','Enter the food name.'],['Escribe el nombre del ejercicio.','Enter the exercise name.'],['Tu navegador no permite copiar.','Your browser cannot copy.'],['Tu navegador no tiene voz.','Your browser has no voice.'],['Logo: perfil de un dios con piel de león','Logo: profile of a god wearing a lion pelt'],['¡Subiste al nivel ','You reached level '],['Comidas registradas','Logged meals'],['Series de hoy','Today’s sets'],['Macros de hoy','Today’s macros'],['Metas del día','Daily goals'],['Añadir comida','Add food'],['Guardar comida','Save food'],['Añadir serie','Add set'],['Guardar serie','Save set'],['Compartir día','Share day'],['Leer macros','Read macros'],['Resumen copiado.','Summary copied.'],['No se pudo copiar.','Could not copy.'],['Arroz con pollo','Chicken and rice'],['Carbohidratos','Carbs'],['Repeticiones','Reps'],['Entrenamiento','Training'],['Última vez: ','Last time: '],['Calorías','Calories'],['Ejercicio','Exercise'],['Peso (lb)','Weight (lb)'],['Sentadilla','Squat'],['Proteína','Protein'],['Comidas','Meals'],['Comida','Food'],['Sistema','System'],['Rutina','Routine'],['Borrar','Delete'],['Grasa','Fat'],['Nivel','Level'],['>de ','>of '],[' de ',' of ']];
 D.sort(function(a,b){return b[0].length-a[0].length});
 function tr(s){if(S.lang!=='en')return s;D.forEach(function(p){s=s.split(p[0]).join(p[1])});return s}
 function ui(){var en=S.lang==='en',b=document.getElementById('th');document.documentElement.lang=en?'en':'es';b.textContent=en?'Mode':'Modo';b.setAttribute('aria-label',tr('Cambiar entre modo claro y oscuro'));document.getElementById('un').textContent=S.me.n;document.getElementById('lg').textContent=en?'Español':'English'}
@@ -141,7 +155,7 @@ var CK='<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" style
 var DB='<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/></svg>';
 var NV={comidas:'<path d="M7 3v8M4 3v5a3 3 0 0 0 3 3 3 3 0 0 0 3-3V3M7 11v10M17 21V3c-3 1-4.5 4-4.5 8H17"/>',rutina:'<path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/>',timer:'<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9.5 2h5M12 2v3"/>',progreso:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',strategos:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/>'};
 var NL={comidas:'Comidas',rutina:'Rutina',timer:'Timer',progreso:'Progreso',strategos:'Strategos'};
-function navHtml(){return'<nav>'+Object.keys(NV).map(function(k){var fb=(k==='comidas'||k==='rutina')&&tab===k?'<button class="fab'+(k==='comidas'?' first':'')+'" onclick="goForm()">'+(k==='rutina'?'Añadir serie':'Añadir comida')+'</button>':'';return'<div class="ni">'+fb+'<button class="'+(tab===k?'on':'')+'" onclick="setTab(\''+k+'\')"'+(tab===k?' aria-current="page"':'')+'><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+NV[k]+'</svg>'+NL[k]+'</button></div>'}).join('')+'</nav>'}
+function navHtml(){return'<nav>'+Object.keys(NV).map(function(k){var fb=false?'<button class="fab'+(k==='comidas'?' first':'')+'" onclick="goForm()">'+(k==='rutina'?'Añadir serie':'Añadir comida')+'</button>':'';return'<div class="ni">'+fb+'<button class="'+(tab===k?'on':'')+'" onclick="setTab(\''+k+'\')"'+(tab===k?' aria-current="page"':'')+'><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+NV[k]+'</svg>'+NL[k]+'</button></div>'}).join('')+'</nav>'}
 function bestBefore(n){var b=0;Object.keys(S.sets).forEach(function(d){if(d<day())S.sets[d].forEach(function(x){if(x.n.toLowerCase()===n.toLowerCase()&&x.w>b)b=x.w})});return b}
 function coach(){var L=level(),s=S.sets[day()]||[],ls=[];
 if(tab==='rutina'){
@@ -310,11 +324,11 @@ else if(tab==='strategos'){h+=me()+aiKeyView()+backupView()}
 else if(tab==='timer'){h+=tmView()}
 else{var s=S.sets[day()]||[],names={};Object.keys(S.sets).forEach(function(d){S.sets[d].forEach(function(x){names[x.n]=1})});
 h+=planView();
-h+='<section class="win"><h2>Series de hoy</h2>'+(s.length?exRows(s)+'<div class="row"><button onclick="share()">Compartir día</button></div>':'<p class="empty">Toca el botón azul para registrar la primera serie.</p>')+'</section>';
+h+='<section class="win"><h2>Series de hoy</h2>'+(s.length?exRows(s)+'<div class="row"><button onclick="share()">Compartir día</button></div>':'<p class="empty">Escribe tu primera serie en la barra de abajo, por ejemplo “sentadilla 3x10 130 lb”.</p>')+'</section>';
 h+='<section class="win"><h2>Añadir serie</h2><label for="en">Ejercicio</label><input id="en" list="ex" placeholder="Sentadilla"><datalist id="ex">'+Object.keys(names).map(function(n){return'<option value="'+esc(n)+'">'}).join('')+'</datalist><div class="grid"><div><label for="ew">Peso (lb)</label><input id="ew" type="number" inputmode="decimal"></div><div><label for="er">Repeticiones</label><input id="er" type="number" inputmode="numeric"></div></div><div class="row"><button class="go" onclick="addSet()">Guardar serie</button></div></section>';
 h+=aiView('sets');h+=tplView();h+=routinesView()}
 h+=navHtml();
-document.getElementById('app').innerHTML=tr(h);if(tab==='timer')tmDraw()}
+document.getElementById('app').innerHTML=tr(h);if(tab==='timer')tmDraw();qaVis()}
 /* ---- Medidas, fotos, fuerza, plantillas ---- */
 var BM=[['w','Cintura','Waist'],['c','Pecho','Chest'],['a','Brazo','Arm'],['t','Muslo','Thigh']];
 function saveBody(){var o={},any=0;BM.forEach(function(m){var v=parseFloat((document.getElementById('bm'+m[0])||{}).value);if(v>0){o[m[0]]=v;any=1}});if(!any){say(T('Escribe al menos una medida en pulgadas.','Enter at least one measurement in inches.'));return}
@@ -361,5 +375,55 @@ function tplView(){return'<section class="win"><h2>'+T('Rutinas listas','Ready-m
 if('serviceWorker' in navigator&&/^https?:/.test(location.protocol))window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})});
 window.addEventListener('offline',function(){say(T('Sin internet: la app sigue funcionando; la búsqueda de comida y la IA no.','Offline: the app still works; food search and AI do not.'))});
 window.addEventListener('online',function(){say(T('Conexión recuperada.','Back online.'))});
+/* ---- Barra universal: texto, voz y + ---- */
+var QA={lang:'',busy:false,rec:null,fin:false},QD={meals:[],sets:[]},SRC=window.SpeechRecognition||window.webkitSpeechRecognition;
+var QI={plus:'<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',mic:'<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>',send:'<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg>'};
+function qaBuild(){var el=document.getElementById('qa');if(!el)return;var v=(document.getElementById('qi')||{}).value||'';QA.lang=S.lang;
+el.innerHTML='<button class="qb" id="qp" onpointerdown="event.preventDefault()" onclick="qaMenu()" aria-label="'+T('Más opciones','More options')+'" aria-haspopup="true" aria-expanded="false">'+QI.plus+'</button><input id="qi" type="text" enterkeyhint="send" autocomplete="off" aria-label="'+T('Escribe una comida o una serie','Type a meal or a set')+'" placeholder="'+T('Comida o serie: “pollo 300 kcal”, “sentadilla 3x10 130 lb”','Meal or set: “chicken 300 kcal”, “squat 3x10 130 lb”')+'">'+(SRC?'<button class="qb" id="qmic" onpointerdown="event.preventDefault()" onclick="qaMic()" aria-label="'+T('Dictar con la voz','Dictate')+'">'+QI.mic+'</button>':'')+'<button class="qb go" id="qs" onpointerdown="event.preventDefault()" onclick="qaSend()" aria-label="'+T('Enviar','Send')+'">'+QI.send+'</button><input id="qph" type="file" accept="image/*" hidden onchange="qaPhoto(this)">';
+var i=document.getElementById('qi');i.value=v;i.onkeydown=function(e){if(e.key==='Enter'){e.preventDefault();qaSend()}};i.onfocus=function(){document.body.classList.add('typing');qaMenu(false)};i.onblur=function(){document.body.classList.remove('typing')}}
+function qaVis(){var el=document.getElementById('qa');if(!el)return;var on=tab==='comidas'||tab==='rutina'||tab==='progreso';if(!el.firstChild||QA.lang!==S.lang)qaBuild();el.hidden=!on;if(!on){qaMenu(false);document.getElementById('qd').hidden=true}else qdDraw()}
+function qaMenu(f){var m=document.getElementById('qm'),b=document.getElementById('qp');if(!m)return;var open=(f===undefined)?m.hidden:f;
+if(open){var mg=document.getElementById('msg');if(mg)mg.textContent='';m.innerHTML=[['qaPick(0)',T('Foto de comida (IA)','Meal photo (AI)')],['qaPick(1)',T('Formulario de comida','Meal form')],['qaPick(2)',T('Formulario de serie','Set form')],['qaPick(3)',T('Tomé agua (+8 oz)','Had water (+8 oz)')]].map(function(x){return'<button onpointerdown="event.preventDefault()" onclick="'+x[0]+'">'+x[1]+'</button>'}).join('')}
+m.hidden=!open;if(b)b.setAttribute('aria-expanded',open?'true':'false')}
+function qaForm(t){tab=t;say('');render();setTimeout(function(){goForm()},60)}
+function qaPick(i){qaMenu(false);if(i===0){if(!(S.ai&&S.ai.key)){say(T('Primero pon tu clave de Gemini en Strategos.','First add your Gemini key in Strategos.'));return}document.getElementById('qph').click()}else if(i===1)qaForm('comidas');else if(i===2)qaForm('rutina');else addWater(8)}
+function lbOf(w,u){w=+w||0;return /^kg|^kilo/i.test(u||'')?Math.round(w*2.20462*2)/2:w}
+function cap(s){s=s.trim();return s.charAt(0).toUpperCase()+s.slice(1)}
+function qaRule(text){var parts=text.split(/[;\n]+/).map(function(x){return x.trim()}).filter(Boolean),o={meals:[],sets:[]};if(!parts.length)return null;
+for(var i=0;i<parts.length;i++){var p=parts[i].replace(/,/g,'.'),m;
+if(m=p.match(/^(.+?)\s+(\d{1,2})\s*(?:x|×|por|series?\s*(?:de)?|sets?\s*(?:of)?)\s*(\d{1,3})(?:\s*(?:reps?|repeticiones))?(?:\s*(?:con|@|a|de|at|with)?\s*(\d+(?:\.\d+)?)\s*(lb|lbs|libras?|kg|kilos?)?)?\s*$/i)){var k=Math.min(Math.max(+m[2],1),15),w=m[4]?lbOf(m[4],m[5]):0;for(var j=0;j<k;j++)o.sets.push({n:cap(m[1]),w:w,r:+m[3]})}
+else if(m=p.match(/^(.+?)\s+(\d+(?:\.\d+)?)\s*(lb|lbs|libras?|kg|kilos?)\s*(?:x|×|por)\s*(\d{1,3})\s*$/i))o.sets.push({n:cap(m[1]),w:lbOf(m[2],m[3]),r:+m[4]});
+else if(m=p.match(/^(.+?)\s+(\d{2,4})\s*(?:kcal|cal|calorias|calorías|calories)\s*$/i))o.meals.push({n:cap(m[1]),t:hourType(),k:+m[2],p:0,c:0,g:0,fi:0,so:0});
+else return null}
+return o}
+var QP='Eres un asistente de gimnasio y nutrición. Clasifica el texto del usuario. Devuelve SOLO JSON con la forma {"meals":[{"n":"nombre","t":"d|a|c|m","k":kcal,"p":proteina_g,"c":carbohidratos_g,"g":grasa_g,"fi":fibra_g,"so":sodio_mg}],"sets":[{"n":"ejercicio","w":peso_en_lb,"r":repeticiones}]}. Comida o bebida va en meals (t: d desayuno, a almuerzo, c cena, m merienda; un elemento por alimento; si no hay cantidades estima una porción típica). Ejercicio va en sets: cada serie es un elemento (3 series = 3 elementos); convierte kg a libras; sin peso usa 0. Si no es ninguna de las dos, devuelve las dos listas vacías. Texto: ';
+function qaNorm(o){var a=Array.isArray(o)?o:null,ml=(o&&o.meals)||(a?a:(o&&!o.sets&&o.items)||[]),sl=(o&&o.sets)||[];
+return{meals:ml.slice(0,30).map(function(x){return{n:String(x.n||'?').slice(0,80),t:('dacm'.indexOf(x.t)>=0&&x.t)?x.t:hourType(),k:+x.k||0,p:+x.p||0,c:+x.c||0,g:+x.g||0,fi:+x.fi||0,so:+x.so||0}}),sets:sl.slice(0,40).map(function(x){return{n:String(x.n||'?').slice(0,80),w:+x.w||0,r:+x.r||0}})}}
+async function qaAI(parts,clear){QA.busy=true;qdDraw();
+try{var t=await gem(parts,true),o=JSON.parse(String(t).replace(/^\s*```(?:json)?/i,'').replace(/```\s*$/,'').trim());QD=qaNorm(o);if(!QD.meals.length&&!QD.sets.length)say(T('No encontré comida ni ejercicio en eso.','I found no meal or exercise in that.'));else if(clear){var i=document.getElementById('qi');if(i)i.value=''}}
+catch(e){say(e.message==='nokey'?T('Primero pon tu clave de Gemini en Strategos.','First add your Gemini key in Strategos.'):netErr(e))}
+QA.busy=false;qdDraw()}
+function qaSend(){var i=document.getElementById('qi');if(!i||QA.busy)return;var text=i.value.trim();if(!text){i.focus();return}i.blur();
+var r=qaRule(text);if(r){QD=r;i.value='';qdDraw();return}
+if(!(S.ai&&S.ai.key)){say(T('Sin IA entiendo frases como “sentadilla 3x10 130 lb” o “arroz 300 kcal”. Para texto libre pon tu clave de Gemini en Strategos.','Without AI I understand phrases like “squat 3x10 130 lb” or “rice 300 kcal”. For free text add your Gemini key in Strategos.'));return}
+qaAI([{text:QP+text}],true)}
+async function qaPhoto(inp){var f=inp.files&&inp.files[0];if(!f)return;try{var b=await shrink(f);inp.value='';await qaAI([{text:QP+'Mira la foto, identifica los alimentos y estima la porción de cada uno.'},{inline_data:{mime_type:'image/jpeg',data:b}}],false)}catch(e){say(T('No se pudo leer la foto.','Could not read the photo.'))}}
+function qaMic(){var b=document.getElementById('qmic');if(QA.rec){try{QA.rec.stop()}catch(e){}return}if(!SRC)return;
+try{var r=new SRC();r.lang=T('es-ES','en-US');r.interimResults=true;r.continuous=false;QA.fin=false;
+r.onresult=function(e){var t='';for(var k=0;k<e.results.length;k++)t+=e.results[k][0].transcript;var i=document.getElementById('qi');if(i)i.value=t;if(e.results[e.results.length-1].isFinal)QA.fin=true};
+r.onerror=function(e){var c=e&&e.error;say(c==='not-allowed'||c==='service-not-allowed'?T('Permite el micrófono para este sitio en Chrome.','Allow the microphone for this site in Chrome.'):c==='network'?T('El dictado necesita internet.','Dictation needs internet.'):c==='no-speech'?T('No te escuché. Intenta otra vez.','I didn’t hear you. Try again.'):T('No pude usar el micrófono.','Could not use the microphone.'))};
+r.onend=function(){QA.rec=null;if(b){b.classList.remove('on');b.setAttribute('aria-pressed','false')}if(QA.fin){QA.fin=false;qaSend()}};
+QA.rec=r;r.start();if(b){b.classList.add('on');b.setAttribute('aria-pressed','true')};say(T('Escuchando…','Listening…'))}catch(e){QA.rec=null;say(T('No pude usar el micrófono.','Could not use the microphone.'))}}
+function qdDrop(k,i){QD[k].splice(i,1);qdDraw()}
+function sk(x){return x.n+'|'+x.w+'|'+x.r}
+function qdDropSet(i){var k=sk(QD.sets[i]);QD.sets=QD.sets.filter(function(x){return sk(x)!==k});qdDraw()}
+function qdClear(){QD={meals:[],sets:[]};qdDraw()}
+function qdSave(){var nm=QD.meals.length,ns=QD.sets.length;if(!nm&&!ns)return;if(nm){var a=(S.meals[day()]=S.meals[day()]||[]);QD.meals.forEach(function(x){a.push(Object.assign({},x))})}if(ns){var b=(S.sets[day()]=S.sets[day()]||[]);QD.sets.forEach(function(x){b.push({n:x.n,w:x.w,r:x.r})})}
+add((nm?10:0)+(ns?15:0));QD={meals:[],sets:[]};if(nm&&!ns)tab='comidas';else if(ns&&!nm)tab='rutina';checkMissions();render();window.scrollTo(0,0)}
+function qdDraw(){var el=document.getElementById('qd');if(!el)return;var n=QD.meals.length+QD.sets.length;
+if(QA.busy){el.hidden=false;el.innerHTML='<p class="empty" role="status">'+T('Pensando…','Thinking…')+'</p>';return}
+if(!n){el.hidden=true;el.innerHTML='';return}
+var MN={d:T('Desayuno','Breakfast'),a:T('Almuerzo','Lunch'),c:T('Cena','Dinner'),m:T('Merienda','Snack')};
+el.hidden=false;el.innerHTML='<h3 class="grp" style="margin-top:0">'+T('Revisa antes de guardar','Review before saving')+'</h3><ul>'+QD.meals.map(function(x,i){return'<li><span><b class="tg">'+T('Comida','Meal')+' · '+MN[x.t]+'</b> '+esc(x.n)+'<small>'+Math.round(x.k)+' kcal · P '+Math.round(x.p)+' · C '+Math.round(x.c)+' · G '+Math.round(x.g)+'</small></span><button class="chip" onpointerdown="event.preventDefault()" onclick="qdDrop(\'meals\','+i+')" aria-label="'+T('Quitar','Remove')+' '+esc(x.n)+'">✕</button></li>'}).join('')+QD.sets.map(function(x,i){var k=sk(x);if(QD.sets.findIndex(function(y){return sk(y)===k})!==i)return'';var c=QD.sets.filter(function(y){return sk(y)===k}).length;return'<li><span><b class="tg">'+T('Serie','Set')+'</b> '+esc(x.n)+'<small>'+c+' × '+x.r+' · '+x.w+' lb</small></span><button class="chip" onpointerdown="event.preventDefault()" onclick="qdDropSet('+i+')" aria-label="'+T('Quitar','Remove')+' '+esc(x.n)+'">✕</button></li>'}).join('')+'</ul><div class="row"><button class="go" onclick="qdSave()">'+T('Guardar todo','Save all')+'</button><button onclick="qdClear()">'+T('Descartar','Discard')+'</button></div>'}
 load();theme();ui();render();
 </script></body></html>
