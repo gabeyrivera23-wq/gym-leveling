@@ -151,6 +151,7 @@ svg [role=button]{cursor:pointer}svg [role=button]:focus-visible{outline:2px sol
 </main>
 <script>
 var LV={w:null,l:0,tm:0};
+var VPAUSE=650;
 var VAI=[['Algenib',{es:'Grave y rasposa',en:'Deep and gravelly'}],['Charon',{es:'Seria e informativa',en:'Serious, informative'}],['Orus',{es:'Firme',en:'Firm'}],['Alnilam',{es:'Firme y clara',en:'Firm and clear'}],['Gacrux',{es:'Madura',en:'Mature'}],['Fenrir',{es:'Intensa',en:'Intense'}],['Kore',{es:'Firme (suave)',en:'Firm (soft)'}],['Puck',{es:'Alegre',en:'Upbeat'}]];
 var S={xp:0,meals:{},sets:{},theme:'',goals:{k:2200,p:150,c:220,g:70,f:28,s:2300,w:64},lang:'es',water:{},weights:{},fav:[],routines:[],plan:[],done:{},body:{},photos:[],sx:'',wu:'',fc:{},me:{n:'',l:'',f:'',i:'',a:'',x:'',o:'m'}},tab='comidas';
 function toLb(o){var c=function(w){return Math.round((+w||0)*2.20462*2)/2};if(o.sets&&typeof o.sets==='object')Object.keys(o.sets).forEach(function(d){if(Array.isArray(o.sets[d]))o.sets[d].forEach(function(x){x.w=c(x.w)})});if(Array.isArray(o.plan))o.plan.forEach(function(x){x.w=c(x.w)});if(Array.isArray(o.routines))o.routines.forEach(function(r){if(r&&Array.isArray(r.ex))r.ex.forEach(function(x){x.w=c(x.w)})})}
@@ -710,7 +711,7 @@ function lvCheck(){var l=level().l;if(LV.imp){S.lv=l;return}if(!(S.lv>0)){S.lv=l
 var _imp=importText;importText=function(t){LV.imp=true;try{_imp(t)}finally{LV.imp=false}S.lv=level().l;LV.l=0;LV.w=null;save();render()};
 
 /* ---- Voz: normal, dios griego o silencio ---- */
-var VZ={rest:{es:['¡Mortal, el descanso ha terminado! ¡Levántate!','Los dioses esperan. ¡Vuelve a la batalla!','¡Basta de descansar, héroe! El Olimpo te observa.','Tu próxima serie te llama, guerrero. ¡No temas al hierro!'],en:['Mortal, thy rest is ended! Rise!','The gods await. Return to battle!','Enough rest, hero. Olympus is watching.','Thy next set calls, warrior. Fear not the iron!']},
+var VZ={rest:{es:['Mortal... el descanso ha terminado. ¡Levántate!','Los dioses esperan... ¡Vuelve a la batalla!','Basta de descansar, héroe... El Olimpo te observa.','Tu próxima serie te llama, guerrero... ¡No temas al hierro!'],en:['Mortal, thy rest is ended! Rise!','The gods await. Return to battle!','Enough rest, hero. Olympus is watching.','Thy next set calls, warrior. Fear not the iron!']},
 pr:{es:['¡Un nuevo récord! Hasta Zeus está impresionado.','¡Has superado tu marca, mortal! Los dioses te aplauden.'],en:['A new record! Even Zeus is impressed.','Thou hast surpassed thy mark, mortal! The gods applaud.']}};
 function vzPick(a){return a[Math.floor(Math.random()*a.length)]}
 function vzVoices(){try{var l=speechSynthesis.getVoices()||[],p=S.lang==='en'?'en':'es';return l.filter(function(v){return(v.lang||'').toLowerCase().indexOf(p)===0})}catch(e){return[]}}
@@ -719,17 +720,17 @@ function vzVoice(){var l=vzVoices();if(!l.length)return null;if(S.vzv){for(var i
 function vzSay(k,a,b){try{if(S.vz==='o'&&k!=='macros')return;if(!window.speechSynthesis&&!S.vzai)return;var g=S.vz==='g',es=S.lang!=='en',t='';
 if(k==='rest')t=(VZ.pre&&VZ.pre.g===g&&VZ.pre.t)||(g?vzPick(VZ.rest[es?'es':'en']):T('Descanso terminado','Rest is over'));
 else if(k==='macros'){var m=totals(),R=Math.round,fp=R((S.goals.p||0)-m.p);
-if(g)t=es?'Escucha, mortal. Hoy has consumido '+R(m.k)+' calorías, '+R(m.p)+' gramos de proteína, '+R(m.c)+' de carbohidratos y '+R(m.g)+' de grasa. '+(fp>0?'Aún te faltan '+fp+' gramos de proteína para satisfacer a los dioses.':'Tu meta de proteína está cumplida. Los dioses están complacidos.'):'Listen, mortal. Today thou hast consumed '+R(m.k)+' calories, '+R(m.p)+' grams of protein, '+R(m.c)+' of carbs and '+R(m.g)+' of fat. '+(fp>0?'Thou still lackest '+fp+' grams of protein to please the gods.':'Thy protein goal is met. The gods are pleased.');
+if(g)t=es?'Escucha, mortal... Hoy has consumido '+R(m.k)+' calorías, '+R(m.p)+' gramos de proteína, '+R(m.c)+' de carbohidratos y '+R(m.g)+' de grasa. '+(fp>0?'Aún te faltan '+fp+' gramos de proteína para satisfacer a los dioses.':'Tu meta de proteína está cumplida. Los dioses están complacidos.'):'Listen, mortal. Today thou hast consumed '+R(m.k)+' calories, '+R(m.p)+' grams of protein, '+R(m.c)+' of carbs and '+R(m.g)+' of fat. '+(fp>0?'Thou still lackest '+fp+' grams of protein to please the gods.':'Thy protein goal is met. The gods are pleased.');
 else t=es?'Hoy llevas '+R(m.k)+' calorías, '+R(m.p)+' gramos de proteína, '+R(m.c)+' de carbohidratos y '+R(m.g)+' de grasa.':'Today you have '+R(m.k)+' calories, '+R(m.p)+' grams of protein, '+R(m.c)+' of carbs and '+R(m.g)+' of fat.'}
 else if(k==='test')t=g?(es?'Soy el trueno del Olimpo. Levántate, mortal, y entrena.':'I am the thunder of Olympus. Rise, mortal, and train.'):T('Prueba de voz','Voice test');
 else if(!g)return;
 else if(k==='lvl')t=es?'Los dioses te honran. Has ascendido al nivel '+a+(b?'. Alcanzas el rango '+b+'.':'.'):'The gods honor thee. Thou hast risen to level '+a+(b?'. Thou hast reached rank '+b+'.':'.');
 else if(k==='pr')t=vzPick(VZ.pr[es?'es':'en']);
 if(!t)return;if(k==='rest'&&VZ.pre&&VZ.pre.g===g&&VZ.pre.t){t=VZ.pre.t}VZ.pre=null;vzPlay(t,g,k)}catch(e){}}
-function vzBrowser(t,g){try{var es=S.lang!=='en',u=new SpeechSynthesisUtterance(t),v=vzVoice();u.lang=es?'es-ES':'en-US';if(v){u.voice=v;u.lang=v.lang||u.lang}u.pitch=g?.75:1;u.rate=g?.88:1;u.volume=1;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}
+function vzBrowser(t,g){try{var es=S.lang!=='en',u=new SpeechSynthesisUtterance(t),v=vzVoice();u.lang=es?'es-ES':'en-US';if(v){u.voice=v;u.lang=v.lang||u.lang}u.pitch=g?.75:1;u.rate=g?.88:1;u.volume=1;speechSynthesis.cancel();setTimeout(function(){try{speechSynthesis.speak(u)}catch(e){}},VPAUSE)}catch(e){}}
 function vzSet(v){S.vz=v;save();vzSay('test');render()}
 function vzTest(){if(S.vz==='o'){say(T('La voz está en silencio.','Voice is muted.'));return}vzSay('test')}
-var APPV='23 nov 2026 · v9 · íconos y gráficas';
+var APPV='23 nov 2026 · v10 · voz sin descripción y con pausa';
 function vzPref(){var vs=vzVoices(),cur=vzVoice(),o=function(v,l){return'<option value="'+v+'"'+((S.vz||'n')===v?' selected':'')+'>'+l+'</option>'};
 return'<label for="vzm" style="margin-top:8px">'+T('Voz de la app','App voice')+'</label><select id="vzm" onchange="vzSet(this.value)">'+o('n',T('Normal','Normal'))+o('g',T('Dios griego (grave y épica)','Greek god (deep and epic)'))+o('o',T('Silencio','Muted'))+'</select>'+
 (vs.length?'<label for="vzv">'+T('Voz del teléfono','Phone voice')+'</label><select id="vzv" onchange="S.vzv=this.value;save();vzSay(\'test\')"><option value="">'+T('Automática','Automatic')+'</option>'+vs.map(function(v){return'<option value="'+esc(v.voiceURI||v.name)+'"'+(S.vzv&&cur&&(cur.voiceURI===v.voiceURI||cur.name===v.name)&&(S.vzv===v.voiceURI||S.vzv===v.name)?' selected':'')+'>'+esc(v.name)+'</option>'}).join('')+'</select>':'')+
@@ -738,20 +739,24 @@ try{if(window.speechSynthesis)speechSynthesis.onvoiceschanged=function(){if(tab=
 
 /* ---- Voz humana con IA de Gemini (opcional, con caché sin internet) ---- */
 var VM=['gemini-3.8-flash-tts','gemini-3.8-flash-lite-tts'],VAU=null;
-function idb(){return new Promise(function(ok,no){try{var r=indexedDB.open('gl-voice',1);r.onupgradeneeded=function(){r.result.createObjectStore('a')};r.onsuccess=function(){ok(r.result)};r.onerror=function(){no(r.error)}}catch(e){no(e)}})}
+try{indexedDB.deleteDatabase('gl-voice')}catch(e){}
+function idb(){return new Promise(function(ok,no){try{var r=indexedDB.open('gl-voice2',1);r.onupgradeneeded=function(){r.result.createObjectStore('a')};r.onsuccess=function(){ok(r.result)};r.onerror=function(){no(r.error)}}catch(e){no(e)}})}
 function idbGet(k){return idb().then(function(d){return new Promise(function(ok){var q=d.transaction('a').objectStore('a').get(k);q.onsuccess=function(){ok(q.result||null)};q.onerror=function(){ok(null)}})}).catch(function(){return null})}
 function idbPut(k,v){return idb().then(function(d){return new Promise(function(ok){var t=d.transaction('a','readwrite');t.objectStore('a').put(v,k);t.oncomplete=function(){ok()};t.onerror=function(){ok()}})}).catch(function(){})}
 function b64buf(b){var s=atob(b),n=s.length,u=new Uint8Array(n);for(var i=0;i<n;i++)u[i]=s.charCodeAt(i);return u}
 function wavOf(u8,mime){if(u8.length>12&&u8[0]===82&&u8[1]===73&&u8[2]===70&&u8[3]===70)return u8.buffer.slice(u8.byteOffset,u8.byteOffset+u8.byteLength);var m=/rate=(\d+)/.exec(mime||''),sr=m?+m[1]:24000,h=new ArrayBuffer(44),d=new DataView(h),w=function(o,t){for(var i=0;i<t.length;i++)d.setUint8(o+i,t.charCodeAt(i))};
 w(0,'RIFF');d.setUint32(4,36+u8.length,true);w(8,'WAVE');w(12,'fmt ');d.setUint32(16,16,true);d.setUint16(20,1,true);d.setUint16(22,1,true);d.setUint32(24,sr,true);d.setUint32(28,sr*2,true);d.setUint16(32,2,true);d.setUint16(34,16,true);w(36,'data');d.setUint32(40,u8.length,true);var o=new Uint8Array(44+u8.length);o.set(new Uint8Array(h),0);o.set(u8,44);return o.buffer}
-function vzStyle(g){return S.lang==='en'?(g?'Say this in a deep, slow, solemn and epic voice, like a Greek god speaking from Mount Olympus, with dramatic pauses: ':'Say this in a natural, warm and clear voice: '):(g?'Di esto con voz profunda, lenta, solemne y épica, como un dios griego que habla desde el Olimpo, con pausas dramáticas: ':'Di esto con voz natural, cálida y clara: ')}
+function vzStyle(){return''}
 async function vzAI(t,g,onlyCache,nocache){var k=S.ai&&S.ai.key;if(!k)throw new Error('nokey');var vo=S.vzav||(g?'Algenib':'Kore'),id=(g?'g|':'n|')+vo+'|'+t,c=await idbGet(id);if(c)return c;if(onlyCache)return null;
 var last='';for(var i=0;i<VM.length;i++){var r=await fetchT('https://generativelanguage.googleapis.com/v1beta/models/'+VM[i]+':generateContent',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':k},body:JSON.stringify({contents:[{parts:[{text:vzStyle(g)+t}]}],generationConfig:{responseModalities:['AUDIO'],speechConfig:{voiceConfig:{prebuiltVoiceConfig:{voiceName:vo}}}}})},40000,1);
 if(!r.ok){var e=await r.text();last='Gemini '+r.status+': '+e.slice(0,120);if(r.status===404||r.status===429||r.status===400)continue;throw new Error(last)}
 var j=await r.json(),pt=(((j.candidates||[])[0]||{}).content||{}).parts||[],id2=null;for(var q=0;q<pt.length;q++)if(pt[q].inlineData&&pt[q].inlineData.data)id2=pt[q].inlineData;if(!id2){last='Gemini: sin audio';continue}
 var buf=wavOf(b64buf(id2.data),id2.mimeType);if(!nocache)idbPut(id,buf);return buf}
 throw new Error(last||'Gemini TTS')}
-function vzPlayBuf(buf){return new Promise(function(ok,no){try{if(VAU){VAU.pause();URL.revokeObjectURL(VAU.src)}var u=URL.createObjectURL(new Blob([buf],{type:'audio/wav'})),a=new Audio(u);VAU=a;a.onended=function(){URL.revokeObjectURL(u);ok()};a.onerror=function(){no(new Error('audio'))};var p=a.play();if(p&&p.catch)p.catch(no)}catch(e){no(e)}})}
+function padWav(buf,ms){try{var u=new Uint8Array(buf),d=new DataView(buf),i=12,off=-1,sz=0;while(i+8<=u.length){var id=String.fromCharCode(u[i],u[i+1],u[i+2],u[i+3]),n=d.getUint32(i+4,true);if(id==='data'){off=i+8;sz=n;break}i+=8+n+(n%2)}
+if(off<0)return buf;var sr=d.getUint32(24,true),ch=d.getUint16(22,true),bp=d.getUint16(34,true),z=Math.round(sr*ms/1000)*ch*(bp/8);if(!(z>0))return buf;if(sz>u.length-off||sz===0)sz=u.length-off;
+var o=new Uint8Array(off+z+sz),dv=new DataView(o.buffer);o.set(u.subarray(0,off),0);o.set(u.subarray(off,off+sz),off+z);dv.setUint32(4,o.length-8,true);dv.setUint32(off-4,sz+z,true);return o.buffer}catch(e){return buf}}
+function vzPlayBuf(buf){return new Promise(function(ok,no){try{if(VAU){VAU.pause();URL.revokeObjectURL(VAU.src)}var u=URL.createObjectURL(new Blob([padWav(buf,VPAUSE)],{type:'audio/wav'})),a=new Audio(u);VAU=a;a.onended=function(){URL.revokeObjectURL(u);ok()};a.onerror=function(){no(new Error('audio'))};var p=a.play();if(p&&p.catch)p.catch(no)}catch(e){no(e)}})}
 async function vzPlay(t,g,k){var useAI=S.vzai&&S.ai&&S.ai.key;if(!useAI){vzBrowser(t,g);return}
 try{var buf=await vzAI(t,g,k==='rest',k==='macros');if(!buf){vzBrowser(t,g);return}if(k==='macros'||k==='test')say(T('Voz IA lista.','AI voice ready.'));await vzPlayBuf(buf)}
 catch(e){if(k==='test'||k==='macros')say(T('La voz IA no respondió ('+String(e&&e.message||e).slice(0,90)+'). Usé la voz del teléfono.','The AI voice did not respond ('+String(e&&e.message||e).slice(0,90)+'). Used the phone voice.'));vzBrowser(t,g)}}
