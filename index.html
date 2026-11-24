@@ -755,7 +755,7 @@ if(!t)return;if(k==='rest'&&VZ.pre&&VZ.pre.g===g&&VZ.pre.t){t=VZ.pre.t}VZ.pre=nu
 function vzBrowser(t,g){try{var es=S.lang!=='en',u=new SpeechSynthesisUtterance(t),v=vzVoice();u.lang=es?'es-ES':'en-US';if(v){u.voice=v;u.lang=v.lang||u.lang}u.pitch=g?.75:1;u.rate=g?.88:1;u.volume=1;speechSynthesis.cancel();var pz=vzPause();if(pz>0)setTimeout(function(){try{speechSynthesis.speak(u)}catch(e){}},pz);else speechSynthesis.speak(u)}catch(e){}}
 function vzSet(v){S.vz=v;save();vzSay('test');render()}
 function vzTest(){if(S.vz==='o'){say(T('La voz está en silencio.','Voice is muted.'));return}vzSay('test')}
-var APPV='23 nov 2026 · v15.1 · botones pequeños';
+var APPV='23 nov 2026 · v15.2 · respaldo compartir';
 function vzPref(){var vs=vzVoices(),cur=vzVoice(),o=function(v,l){return'<option value="'+v+'"'+((S.vz||'n')===v?' selected':'')+'>'+l+'</option>'};
 return'<label for="vzm" style="margin-top:8px">'+T('Voz de la app','App voice')+'</label><select id="vzm" onchange="vzSet(this.value)">'+o('n',T('Normal','Normal'))+o('g',T('Dios griego (grave y épica)','Greek god (deep and epic)'))+o('o',T('Silencio','Muted'))+'</select>'+
 (vs.length?'<label for="vzv">'+T('Voz del teléfono','Phone voice')+'</label><select id="vzv" onchange="S.vzv=this.value;save();vzSay(\'test\')"><option value="">'+T('Automática','Automatic')+'</option>'+vs.map(function(v){return'<option value="'+esc(v.voiceURI||v.name)+'"'+(S.vzv&&cur&&(cur.voiceURI===v.voiceURI||cur.name===v.name)&&(S.vzv===v.voiceURI||S.vzv===v.name)?' selected':'')+'>'+esc(v.name)+'</option>'}).join('')+'</select>':'')+
@@ -921,9 +921,10 @@ function csvGet(k){var r=[];if(k==='m'){r.push(['fecha','tipo','comida','kcal','
 else if(k==='s'){r.push(['fecha','ejercicio','peso_lb','repeticiones']);Object.keys(S.sets).sort().forEach(function(d){S.sets[d].forEach(function(x){r.push([d,x.n,x.w,x.r])})})}
 else{r.push(['fecha','peso_lb']);Object.keys(S.weights).sort().forEach(function(d){r.push([d,S.weights[d]])})}
 return'﻿'+r.map(function(w){return w.map(csvQ).join(',')}).join('\r\n')}
-function fileOut(name,text,mime){var b=new Blob([text],{type:mime}),f=null;try{f=new File([b],name,{type:mime})}catch(e){}
-if(f&&navigator.canShare&&navigator.canShare({files:[f]})){return navigator.share({files:[f],title:name}).catch(function(){})}
-var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1500);say(T('Archivo descargado.','File downloaded.'))}
+function fileOut(name,text,mime){var b=new Blob([text],{type:mime}),dl=function(m){var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1500);say(m||T('Archivo descargado. Búscalo en Descargas.','File downloaded. Look in Downloads.'))};
+var mk=function(t){try{return new File([b],name,{type:t})}catch(e){return null}},list=[mk(mime),mk('text/plain')].filter(function(f){return f&&navigator.canShare&&navigator.canShare({files:[f]})});
+if(!list.length||!navigator.share){dl();return}
+navigator.share({files:[list[0]],title:name}).catch(function(e){if(e&&e.name==='AbortError')return;if(list[1]){navigator.share({files:[list[1]],title:name}).catch(function(e2){if(!(e2&&e2.name==='AbortError'))dl(T('No se pudo compartir; se descargó el archivo.','Could not share; the file was downloaded.'))})}else dl(T('No se pudo compartir; se descargó el archivo.','Could not share; the file was downloaded.'))})}
 function csvDl(k){fileOut('gym-leveling-'+(k==='m'?'comidas':k==='s'?'series':'pesos')+'.csv',csvGet(k),'text/csv')}
 function shareBackup(){S.bk=realDay();save();var cp=Object.assign({},S);delete cp.ai;delete cp.photos;fileOut('gym-leveling-respaldo-'+realDay()+'.json',JSON.stringify(cp),'application/json')}
 var _bv15=backupView;backupView=function(){var h=_bv15(),o=snaps(),ks=Object.keys(o).sort().reverse();
