@@ -147,7 +147,7 @@ svg [role=button]{cursor:pointer}svg [role=button]:focus-visible{outline:2px sol
 .past{border-color:#f59e0b}
 
 .dn.x{}.cmp{padding:8px 10px}.dl{position:relative;flex:1;min-height:44px;display:flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);border-radius:12px}.dl b{flex:none;font-size:16px}.dl input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
-.seg2{display:flex;gap:6px;margin-bottom:12px}.seg2 button{flex:1}
+.seg2{display:flex;gap:6px;margin-bottom:8px}.seg2 button{flex:1;min-height:36px;padding:2px 10px;font-size:15px;border-radius:10px}
 .emp{text-align:center;padding:10px 0}.emp svg{width:64px;height:64px;stroke:var(--blue);fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;opacity:.85}.emp .empty{margin:6px 0 0}
 .empty{font-size:15px}.tot span,.mini small{font-size:15px}
 button.go{min-height:48px}.row{gap:8px}
@@ -755,7 +755,7 @@ if(!t)return;if(k==='rest'&&VZ.pre&&VZ.pre.g===g&&VZ.pre.t){t=VZ.pre.t}VZ.pre=nu
 function vzBrowser(t,g){try{var es=S.lang!=='en',u=new SpeechSynthesisUtterance(t),v=vzVoice();u.lang=es?'es-ES':'en-US';if(v){u.voice=v;u.lang=v.lang||u.lang}u.pitch=g?.75:1;u.rate=g?.88:1;u.volume=1;speechSynthesis.cancel();var pz=vzPause();if(pz>0)setTimeout(function(){try{speechSynthesis.speak(u)}catch(e){}},pz);else speechSynthesis.speak(u)}catch(e){}}
 function vzSet(v){S.vz=v;save();vzSay('test');render()}
 function vzTest(){if(S.vz==='o'){say(T('La voz está en silencio.','Voice is muted.'));return}vzSay('test')}
-var APPV='23 nov 2026 · v15 · más mejoras';
+var APPV='23 nov 2026 · v15.1 · botones pequeños';
 function vzPref(){var vs=vzVoices(),cur=vzVoice(),o=function(v,l){return'<option value="'+v+'"'+((S.vz||'n')===v?' selected':'')+'>'+l+'</option>'};
 return'<label for="vzm" style="margin-top:8px">'+T('Voz de la app','App voice')+'</label><select id="vzm" onchange="vzSet(this.value)">'+o('n',T('Normal','Normal'))+o('g',T('Dios griego (grave y épica)','Greek god (deep and epic)'))+o('o',T('Silencio','Muted'))+'</select>'+
 (vs.length?'<label for="vzv">'+T('Voz del teléfono','Phone voice')+'</label><select id="vzv" onchange="S.vzv=this.value;save();vzSay(\'test\')"><option value="">'+T('Automática','Automatic')+'</option>'+vs.map(function(v){return'<option value="'+esc(v.voiceURI||v.name)+'"'+(S.vzv&&cur&&(cur.voiceURI===v.voiceURI||cur.name===v.name)&&(S.vzv===v.voiceURI||S.vzv===v.name)?' selected':'')+'>'+esc(v.name)+'</option>'}).join('')+'</select>':'')+
@@ -902,7 +902,7 @@ var _th14=theme;theme=function(){_th14();document.body.classList.toggle('cp',!!S
 
 /* ---- v15: Comidas en dos pestañas, plan del día, copias, CSV, metas, logros, offline, letra ---- */
 function ctSet(k){S.ct=k;save();render();window.scrollTo(0,0)}
-function cmTabs(){var k=S.ct==='m'?'m':'h';return'<div class="seg2" role="group" aria-label="'+T('Secciones de comidas','Meal sections')+'"><button class="'+(k==='h'?'on':'')+'" aria-pressed="'+(k==='h')+'" onclick="ctSet(\'h\')">'+T('Registro','Log')+'</button><button class="'+(k==='m'?'on':'')+'" aria-pressed="'+(k==='m')+'" onclick="ctSet(\'m\')">'+T('Más: búsqueda, favoritos, metas','More: search, favorites, goals')+'</button></div>'}
+function cmTabs(){var k=S.ct==='m'?'m':'h';return'<div class="seg2" role="group" aria-label="'+T('Secciones de comidas','Meal sections')+'"><button class="'+(k==='h'?'on':'')+'" aria-pressed="'+(k==='h')+'" onclick="ctSet(\'h\')">'+T('Registro','Log')+'</button><button class="'+(k==='m'?'on':'')+'" aria-pressed="'+(k==='m')+'" onclick="ctSet(\'m\')" title="'+T('Búsqueda, favoritos, combos y metas','Search, favorites, combos and goals')+'">'+T('Más','More')+'</button></div>'}
 var _qs15=qdSave;qdSave=function(){S.ct='h';_qs15.apply(this,arguments)};
 function tplIdx(){var ld=null;Object.keys(S.sets).sort().forEach(function(d){if(d<realDay()&&S.sets[d].length)ld=d});if(!ld)return{n:0,prev:-1};
 var nm=S.sets[ld].map(function(x){return x.n.toLowerCase()}),best=-1,bc=0;
